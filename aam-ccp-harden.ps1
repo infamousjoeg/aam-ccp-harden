@@ -17,6 +17,11 @@ if (!$(Get-InstalledModule psPAS -ErrorAction SilentlyContinue)) {
 # Import psPAS module
 Import-Module psPAS
 
+# Function for colorized Write-Output
+function Color ($fc) {
+    process { Write-Host $_ -ForegroundColor $fc }
+}
+
 # Ask for base PVWA address
 do {
     $pasBaseURI = Read-Host "Enter base PVWA address (eg. https://pvwa.example.com)"
@@ -40,9 +45,9 @@ Switch ($pasAuthType) {
         $pasAuth.Add("Type", "cyberark")
         try {
             New-PASSession @pasAuth -Credential $(Get-Credential)
-            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" | Color Green
         } catch {
-            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" -ForegroundColor Red
+            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" | Color Red
             exit 1
         }
     }
@@ -51,9 +56,9 @@ Switch ($pasAuthType) {
         $pasAuth.Add("Type", "ldap")
         try {
             New-PASSession @pasAuth -Credential $(Get-Credential)
-            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" | Color Green
         } catch {
-            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" -ForegroundColor Red
+            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" | Color Red
             exit 1
         }
     }
@@ -63,9 +68,9 @@ Switch ($pasAuthType) {
         $pasAuth.Add("OTPMode", "challenge")
         try {
             New-PASSession @pasAuth -Credential $(Get-Credential) -OTP $(Read-Host "Enter your one-time passcode")
-            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" | Color Green
         } catch {
-            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" -ForegroundColor Red
+            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" | Color Red
             exit 1
         }
     }
@@ -74,9 +79,9 @@ Switch ($pasAuthType) {
         $pasAuth.Add("Type", "radius")
         try {
             New-PASSession @pasAuth -Credential $(Get-Credential)
-            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" | Color Green
         } catch {
-            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" -ForegroundColor Red
+            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" | Color Red
             exit 1
         }
     }
@@ -86,9 +91,9 @@ Switch ($pasAuthType) {
         $pasAuth.Add("OTPMode", "append")
         try {
             New-PASSession @pasAuth -Credential $(Get-Credential)
-            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" | Color Green
         } catch {
-            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" -ForegroundColor Red
+            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" | Color Red
             exit 1
         }
     }
@@ -96,29 +101,29 @@ Switch ($pasAuthType) {
 
 # If AIMWebService App ID is NOT found...
 if (!$(Get-PASApplication -AppID AIMWebService)) {
-    Write-Output "==> [CREATE] did not detect AIMWebService App ID" -ForegroundColor Green
+    Write-Output "==> [CREATE] did not detect AIMWebService App ID" | Color Green
     # ... add AIMWebService into the Applications module
     try {
         Add-PASApplication -AppID AIMWebService -Description "AAM CCP Web Service App ID" -Location "\"
-        Write-Output "==> [SUCCESS] created Application ID: AIMWebService" -ForegroundColor Green
+        Write-Output "==> [SUCCESS] created Application ID: AIMWebService" | Color Green
     } catch {
-        Write-Output "==> [FAILED] could not create AIMWebService App ID" -ForegroundColor Red
+        Write-Output "==> [FAILED] could not create AIMWebService App ID" | Color Red
         exit 1
     }
 # If AIMWebService App ID IS found...
 } else {
-    Write-Output "==> [SKIPPED] detected AIMWebService App ID" -ForegroundColor Yellow
+    Write-Output "==> [SKIPPED] detected AIMWebService App ID" | Color Yellow
 }
 
 # Begin adding authentication methods to AIMWebService App ID...
 
 # # Add Path Authentication
 Add-PASApplicationAuthenticationMethod -AppID AIMWebService -AuthType path -AuthValue "C:\inetpub\wwwroot\AIMWebService\bin\AIMWebService.dll" -ErrorAction SilentlyContinue
-Write-Output "==> [SUCCESS] Added Path Authentication" -ForegroundColor Green
+Write-Output "==> [SUCCESS] Added Path Authentication" | Color Green
 
 # # Add OSUser Authentication
 Add-PASApplicationAuthenticationMethod -AppID AIMWebService -AuthType osuser -AuthValue "IISAPPPOOL\DefaultAppPool"
-Write-Output "==> [SUCCESS] Added OSUser Authentication" -ForegroundColor Green
+Write-Output "==> [SUCCESS] Added OSUser Authentication" | Color Green
 
 # # Add Hash Authentication
 # # # Use NETAIMGetAppInfo.exe to generate hash of AIMWebService.dll
@@ -127,7 +132,7 @@ $getHashResponse = $(& "C:\Program Files (x86)\CyberArk\ApplicationPasswordProvi
 $aamHashValue = $getHashResponse.Split("`r`n")
 # # # Reference first value in array created from split
 Add-PASApplicationAuthenticationMethod -AppID AIMWebService -AuthType hash -AuthValue $aamHashValue[0] -ErrorAction SilentlyContinue
-Write-Output "==> [SUCCESS] Added Hash Authentication" -ForegroundColor Green
+Write-Output "==> [SUCCESS] Added Hash Authentication" | Color Green
 
 # # Add Machine Address Authentication
 # # # Find local host's IP address from ipconfig
@@ -136,6 +141,6 @@ $aamMachineAddress = ipconfig | findstr /i IPv4 | Out-String
 $aamMachineAddress = $aamMachineAddress.TrimStart("IPv4 Address. . . . . . . . . . . : ")
 $aamMachineAddress = $aamMachineAddress.TrimEnd("`r`n")
 Add-PASApplicationAuthenticationMethod -AppID AIMWebService -AuthType machineAddress -AuthValue $aamMachineAddress -ErrorAction SilentlyContinue
-Write-Output "==> [SUCCESS] Added Machine Address Authentication" -ForegroundColor Green
+Write-Output "==> [SUCCESS] Added Machine Address Authentication" | Color Green
 
-Write-Output "`r`n`r`n*** Completed AIMWebService hardening successfully. ***" -ForegroundColor Cyan
+Write-Output "`r`n`r`n*** Completed AIMWebService hardening successfully. ***" | Color Cyan
