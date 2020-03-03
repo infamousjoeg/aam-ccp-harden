@@ -76,12 +76,15 @@ if (!$(Get-PASApplication -AppID AIMWebService)) {
 }
 
 # Begin adding authentication methods to AIMWebService App ID...
+
 # # Add Path Authentication
 Add-PASApplicationAuthenticationMethod -AppID AIMWebService -AuthType path -AuthValue "C:\inetpub\wwwroot\AIMWebService\bin\AIMWebService.dll" -ErrorAction SilentlyContinue
 Write-Output "==> [SUCCESS] Added Path Authentication" -ForegroundColor Green
+
 # # Add OSUser Authentication
 Add-PASApplicationAuthenticationMethod -AppID AIMWebService -AuthType osuser -AuthValue "IISAPPPOOL\DefaultAppPool"
 Write-Output "==> [SUCCESS] Added OSUser Authentication" -ForegroundColor Green
+
 # # Add Hash Authentication
 # # # Use NETAIMGetAppInfo.exe to generate hash of AIMWebService.dll
 $getHashResponse = $(& "C:\Program Files (x86)\CyberArk\ApplicationPasswordProvider\Utils\NETAIMGetAppInfo.exe" GetHash /AppExecutablePatterns="C:\inetpub\wwwroot\AIMWebService\bin\AIMWebService.dll")
@@ -90,6 +93,7 @@ $aamHashValue = $getHashResponse.Split("`r`n")
 # # # Reference first value in array created from split
 Add-PASApplicationAuthenticationMethod -AppID AIMWebService -AuthType hash -AuthValue $aamHashValue[0] -ErrorAction SilentlyContinue
 Write-Output "==> [SUCCESS] Added Hash Authentication" -ForegroundColor Green
+
 # # Add Machine Address Authentication
 # # # Find local host's IP address from ipconfig
 $aamMachineAddress = ipconfig | findstr /i IPv4 | Out-String
@@ -98,4 +102,5 @@ $aamMachineAddress = $aamMachineAddress.TrimStart("IPv4 Address. . . . . . . . .
 $aamMachineAddress = $aamMachineAddress.TrimEnd("`r`n")
 Add-PASApplicationAuthenticationMethod -AppID AIMWebService -AuthType machineAddress -AuthValue $aamMachineAddress -ErrorAction SilentlyContinue
 Write-Output "==> [SUCCESS] Added Machine Address Authentication" -ForegroundColor Green
+
 Write-Output "`r`n`r`n*** Completed AIMWebService hardening successfully. ***" -ForegroundColor Cyan
