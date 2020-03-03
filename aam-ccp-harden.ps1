@@ -38,47 +38,76 @@ Switch ($pasAuthType) {
     1{
         # Add AuthType and logon to PAS REST API
         $pasAuth.Add("AuthType", "cyberark")
-        New-PASSession @pasAuth -Credential $(Get-Credential) -ErrorAction Stop
-        Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+        try {
+            New-PASSession @pasAuth -Credential $(Get-Credential)
+            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+        } catch {
+            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" -ForegroundColor Red
+            exit 1
+        }
     }
     2{
         # Add AuthType and logon to PAS REST API
         $pasAuth.Add("AuthType", "ldap")
-        New-PASSession @pasAuth -Credential $(Get-Credential) -ErrorAction Stop
-        Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+        try {
+            New-PASSession @pasAuth -Credential $(Get-Credential)
+            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+        } catch {
+            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" -ForegroundColor Red
+            exit 1
+        }
     }
     3{
         # Add AuthType, OTPMode and logon to PAS REST API
         $pasAuth.Add("AuthType", "radius")
         $pasAuth.Add("OTPMode", "challenge")
-        New-PASSession @pasAuth -Credential $(Get-Credential) -OTP $(Read-Host "Enter your one-time passcode") -ErrorAction Stop
-        Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+        try {
+            New-PASSession @pasAuth -Credential $(Get-Credential) -OTP $(Read-Host "Enter your one-time passcode")
+            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+        } catch {
+            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" -ForegroundColor Red
+            exit 1
+        }
     }
     4{
         # Add AuthType, OTPMode and logon to PAS REST API
         $pasAuth.Add("AuthType", "radius")
-        $pasAuth.Add("OTPMode", "push")
-        New-PASSession @pasAuth -Credential $(Get-Credential) -ErrorAction Stop
-        Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+        try {
+            New-PASSession @pasAuth -Credential $(Get-Credential)
+            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+        } catch {
+            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" -ForegroundColor Red
+            exit 1
+        }
     }
     5{
         # Add AuthType, OTPMode and logon to PAS REST API
         $pasAuth.Add("AuthType", "radius")
         $pasAuth.Add("OTPMode", "append")
-        New-PASSession @pasAuth -Credential $(Get-Credential) -ErrorAction Stop
-        Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+        try {
+            New-PASSession @pasAuth -Credential $(Get-Credential)
+            Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
+        } catch {
+            Write-Output "==> [FAILED] could not log onto CyberArk PAS REST API" -ForegroundColor Red
+            exit 1
+        }
     }
 }
 
 # If AIMWebService App ID is NOT found...
 if (!$(Get-PASApplication -AppID AIMWebService)) {
-    Write-Output "==> [CREATE] Did not detect AIMWebService App ID" -ForegroundColor Green
+    Write-Output "==> [CREATE] did not detect AIMWebService App ID" -ForegroundColor Green
     # ... add AIMWebService into the Applications module
-    Add-PASApplication -AppID AIMWebService -Description "AAM CCP Web Service App ID" -Location "\" -ErrorAction Stop
-    Write-Output "==> [SUCCESS] Created Application ID: AIMWebService" -ForegroundColor Green
+    try {
+        Add-PASApplication -AppID AIMWebService -Description "AAM CCP Web Service App ID" -Location "\"
+        Write-Output "==> [SUCCESS] created Application ID: AIMWebService" -ForegroundColor Green
+    } catch {
+        Write-Output "==> [FAILED] could not create AIMWebService App ID" -ForegroundColor Red
+        exit 1
+    }
 # If AIMWebService App ID IS found...
 } else {
-    Write-Output "==> [SKIPPED] Detected AIMWebService App ID" -ForegroundColor Yellow
+    Write-Output "==> [SKIPPED] detected AIMWebService App ID" -ForegroundColor Yellow
 }
 
 # Begin adding authentication methods to AIMWebService App ID...
