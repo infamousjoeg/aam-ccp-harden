@@ -37,7 +37,7 @@ $pasAuth = @{
 Switch ($pasAuthType) {
     1{
         # Add AuthType and logon to PAS REST API
-        $pasAuth.Add("AuthType", "cyberark")
+        $pasAuth.Add("Type", "cyberark")
         try {
             New-PASSession @pasAuth -Credential $(Get-Credential)
             Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
@@ -48,7 +48,7 @@ Switch ($pasAuthType) {
     }
     2{
         # Add AuthType and logon to PAS REST API
-        $pasAuth.Add("AuthType", "ldap")
+        $pasAuth.Add("Type", "ldap")
         try {
             New-PASSession @pasAuth -Credential $(Get-Credential)
             Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
@@ -59,7 +59,7 @@ Switch ($pasAuthType) {
     }
     3{
         # Add AuthType, OTPMode and logon to PAS REST API
-        $pasAuth.Add("AuthType", "radius")
+        $pasAuth.Add("Type", "radius")
         $pasAuth.Add("OTPMode", "challenge")
         try {
             New-PASSession @pasAuth -Credential $(Get-Credential) -OTP $(Read-Host "Enter your one-time passcode")
@@ -71,7 +71,7 @@ Switch ($pasAuthType) {
     }
     4{
         # Add AuthType, OTPMode and logon to PAS REST API
-        $pasAuth.Add("AuthType", "radius")
+        $pasAuth.Add("Type", "radius")
         try {
             New-PASSession @pasAuth -Credential $(Get-Credential)
             Write-Output "==> [SUCCESS] logged onto CyberArk PAS REST API" -ForegroundColor Green
@@ -82,7 +82,7 @@ Switch ($pasAuthType) {
     }
     5{
         # Add AuthType, OTPMode and logon to PAS REST API
-        $pasAuth.Add("AuthType", "radius")
+        $pasAuth.Add("Type", "radius")
         $pasAuth.Add("OTPMode", "append")
         try {
             New-PASSession @pasAuth -Credential $(Get-Credential)
