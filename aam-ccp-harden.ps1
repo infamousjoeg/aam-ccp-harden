@@ -1,5 +1,3 @@
-Import-Module psPAS
-
 #######################
 # Assumptions Made:
 # #
@@ -10,6 +8,14 @@ Import-Module psPAS
 # Permissions Needed:
 # # 
 # # The “Manage Users” permission is required to be held by the user running the function.
+
+# Check for psPAS module and install if missing
+if (!$(Get-InstalledModule psPAS -ErrorAction SilentlyContinue)) {
+    Install-Module psPAS -Confirm:$False -Force
+}
+
+# Import psPAS module
+Import-Module psPAS
 
 # Ask for base PVWA address
 do {
