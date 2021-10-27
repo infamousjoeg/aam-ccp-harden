@@ -118,11 +118,11 @@ if (!$(Get-PASApplication -AppID AIMWebService)) {
 # Begin adding authentication methods to AIMWebService App ID...
 
 # # Add Path Authentication
-Add-PASApplicationAuthenticationMethod -AppID AIMWebService -AuthType path -AuthValue "C:\inetpub\wwwroot\AIMWebService\bin\AIMWebService.dll" -ErrorAction SilentlyContinue
+Add-PASApplicationAuthenticationMethod -AppID AIMWebService -path "C:\inetpub\wwwroot\AIMWebService\bin\AIMWebService.dll" -ErrorAction SilentlyContinue
 Write-Output "==> [SUCCESS] Added Path Authentication" | Color Green
 
 # # Add OSUser Authentication
-Add-PASApplicationAuthenticationMethod -AppID AIMWebService -AuthType osuser -AuthValue "IISAPPPOOL\DefaultAppPool"
+Add-PASApplicationAuthenticationMethod -AppID AIMWebService -osuser "IISAPPPOOL\DefaultAppPool"
 Write-Output "==> [SUCCESS] Added OSUser Authentication" | Color Green
 
 # # Add Hash Authentication
@@ -131,7 +131,7 @@ $getHashResponse = $(& "C:\Program Files (x86)\CyberArk\ApplicationPasswordProvi
 # # # Response returns success message and hash value - need to split at line break
 $aamHashValue = $getHashResponse.Split("`r`n")
 # # # Reference first value in array created from split
-Add-PASApplicationAuthenticationMethod -AppID AIMWebService -AuthType hash -AuthValue $aamHashValue[0] -ErrorAction SilentlyContinue
+Add-PASApplicationAuthenticationMethod -AppID AIMWebService -hash $aamHashValue[0] -ErrorAction SilentlyContinue
 Write-Output "==> [SUCCESS] Added Hash Authentication" | Color Green
 
 # # Add Machine Address Authentication
@@ -140,7 +140,7 @@ $aamMachineAddress = ipconfig | findstr /i IPv4 | Out-String
 # # # Trim off starting and ending notation
 $aamMachineAddress = $aamMachineAddress.TrimStart("IPv4 Address. . . . . . . . . . . : ")
 $aamMachineAddress = $aamMachineAddress.TrimEnd("`r`n")
-Add-PASApplicationAuthenticationMethod -AppID AIMWebService -AuthType machineAddress -AuthValue $aamMachineAddress -ErrorAction SilentlyContinue
+Add-PASApplicationAuthenticationMethod -AppID AIMWebService -machineAddress $aamMachineAddress -ErrorAction SilentlyContinue
 Write-Output "==> [SUCCESS] Added Machine Address Authentication" | Color Green
 
 Write-Output "`r`n`r`n*** Completed AIMWebService hardening successfully. ***" | Color Cyan
