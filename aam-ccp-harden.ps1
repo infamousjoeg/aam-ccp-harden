@@ -35,7 +35,7 @@ do {
 
 # Create hash table for New-PASSession parameters
 $pasAuth = @{
-    BaseURI     = $pasBaseURI.Trim().ToLower()
+    BaseURI = $pasBaseURI.Trim().ToLower()
 }
 
 # Switch case depending on authentication method chosen
@@ -110,7 +110,7 @@ if (!$(Get-PASApplication -AppID AIMWebService)) {
         Write-Output "==> [FAILED] could not create AIMWebService App ID" | Color Red
         exit 1
     }
-# If AIMWebService App ID IS found...
+    # If AIMWebService App ID IS found...
 } else {
     Write-Output "==> [SKIPPED] detected AIMWebService App ID" | Color Yellow
 }
@@ -122,7 +122,7 @@ Add-PASApplicationAuthenticationMethod -AppID AIMWebService -path "C:\inetpub\ww
 Write-Output "==> [SUCCESS] Added Path Authentication" | Color Green
 
 # # Add OSUser Authentication
-Add-PASApplicationAuthenticationMethod -AppID AIMWebService -osuser "IISAPPPOOL\DefaultAppPool"
+Add-PASApplicationAuthenticationMethod -AppID AIMWebService -osUser "IISAPPPOOL\DefaultAppPool"
 Write-Output "==> [SUCCESS] Added OSUser Authentication" | Color Green
 
 # # Add Hash Authentication
@@ -135,12 +135,16 @@ Add-PASApplicationAuthenticationMethod -AppID AIMWebService -hash $aamHashValue[
 Write-Output "==> [SUCCESS] Added Hash Authentication" | Color Green
 
 # # Add Machine Address Authentication
-# # # Find local host's IP address from ipconfig
-$aamMachineAddress = ipconfig | findstr /i IPv4 | Out-String
-# # # Trim off starting and ending notation
-$aamMachineAddress = $aamMachineAddress.TrimStart("IPv4 Address. . . . . . . . . . . : ")
-$aamMachineAddress = $aamMachineAddress.TrimEnd("`r`n")
-Add-PASApplicationAuthenticationMethod -AppID AIMWebService -machineAddress $aamMachineAddress -ErrorAction SilentlyContinue
-Write-Output "==> [SUCCESS] Added Machine Address Authentication" | Color Green
+# # # Find local host's IP address from Get-NetIPAddress
+$aamMachineIP = (Get-NetIPAddress -AddressState Preferred -AddressFamily IPv4).IPAddress
+
+# # # Loop thru returned addresses and omit loopback
+foreach( $ip in $aamMachineIP){
+    if ("127.0.0.1" -ne $ip) {
+        # # # Add IP address
+        Add-PASApplicationAuthenticationMethod -AppID AIMWebService -machineAddress $ip -ErrorAction SilentlyContinue
+        Write-Output "==> [SUCCESS] Added $ip to Machine Address Authentication" | Color Green
+    }
+}
 
 Write-Output "`r`n`r`n*** Completed AIMWebService hardening successfully. ***" | Color Cyan
