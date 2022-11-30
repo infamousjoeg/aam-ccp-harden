@@ -127,7 +127,7 @@ Write-Output "==> [SUCCESS] Added OSUser Authentication" | Color Green
 
 # # Add Hash Authentication
 # # # Use NETAIMGetAppInfo.exe to generate hash of AIMWebService.dll
-$getHashResponse = $(& "C:\Program Files (x86)\CyberArk\ApplicationPasswordProvider\Utils\NETAIMGetAppInfo.exe" GetHash /AppExecutablePatterns="C:\inetpub\wwwroot\AIMWebService\bin\AIMWebService.dll")
+$getHashResponse = $(& "C:\Program Files (x86)\CyberArk\ApplicationPasswordProvider\Utils\NETAIMGetAppInfo.exe" GetHash /AppExecutablesPattern="C:\inetpub\wwwroot\AIMWebService\bin\AIMWebService.dll")
 # # # Response returns success message and hash value - need to split at line break
 $aamHashValue = $getHashResponse.Split("`r`n")
 # # # Reference first value in array created from split
